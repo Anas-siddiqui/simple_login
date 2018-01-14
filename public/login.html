@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="keywords" content="footer, basic, centered, links" />
+
+  <title>Google Home login</title>
+  
+ 
+
+<script src="jquery.min.js"></script>
+	<link rel="stylesheet" href="bootstrap.css">
+	<script src="bootstrap.min.js"></script>
+
+  
+
+     
+   
+
+  
+</head>
+    
+   
+
+ 
+
+<body>
+    <!--login modal-->
+<div id="loginModal" class="modal show" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+  <div class="modal-content">
+      <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h1 class="text-center">Login</h1>
+      </div>
+      <div class="modal-body">
+          <form class="form col-md-12 center-block">
+            <div class="form-group">
+              <input type="text" class="form-control input-lg" id="CustomerEmail" placeholder="Email">
+            </div>
+            <div class="form-group">
+              <input type="password" class="form-control input-lg" id="CustomerPassword" placeholder="Password">
+            </div>
+            <div>
+                <div>
+              <button id="sign" type="button" class="btn btn-primary btn-lg btn-block" onclick="clicker2()">Sign In</button>
+                    </div>
+              
+            </div>
+          </form>
+      </div>
+      <div class="modal-footer">
+          <div class="col-md-12">
+          
+		  </div>	
+      </div>
+        <div id="msgloading" class="alert alert-info alert-dismissible collapse" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <strong>Loading.....</strong>
+</div>
+       <div id="msgsuccess" class="alert alert-success alert-dismissible collapse" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <strong>Successfully logged in</strong>
+</div>
+       <div id="msgerror" class="alert alert-danger alert-dismissible collapse" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  
+</div>
+ 
+  </div>
+  </div>
+     
+</div>
+ 
+    
+    
+    </body>
+    <script>
+        var state="";
+        var uri="";
+      state=getParameterByName('state');
+      uri=getParameterByName('redirect_uri');
+        //console.log(state)
+        //console.log(uri);
+        
+    $(document).ready(function(){
+        $("#CustomerPassword").keyup(function(event){
+    if(event.keyCode == 13){
+        $("#sign").click();
+    }
+            });
+    $("#CustomerEmail").keyup(function(event){
+    if(event.keyCode == 13){
+        $("#sign").click();
+    }
+});
+});
+     
+    function clicker4(){alert("hello")}
+       function clicker2(){
+      
+       
+           var msgloading= document.getElementById('msgloading');
+            var msgsuccess= document.getElementById('msgsuccess');
+           var msgerror= document.getElementById('msgerror');
+          
+             var email = document.getElementById("CustomerEmail").value;
+    var pwd = document.getElementById("CustomerPassword").value;
+      
+    if(email == "")
+    {
+         msgloading.classList.add ("collapse");
+         msgsuccess.classList.add ("collapse");
+     
+ msgerror.innerHTML="<strong>Enter Email</strong>";
+         msgerror.classList.remove ("collapse");
+    }
+    else if(pwd == "")
+    {
+         msgloading.classList.add ("collapse");
+         msgsuccess.classList.add ("collapse");
+        msgerror.innerHTML="<strong>Enter Password</strong>";
+         msgerror.classList.remove ("collapse");
+     
+    
+    }
+    else
+    {
+        msgloading.classList.remove ("collapse");
+        $(document.body).css({ 'cursor': 'wait' });
+           var mydata={
+               email:email,password:pwd 
+           }
+       
+            $.ajax({
+      type: 'POST',
+      url: "/api/authenticate",
+      data: mydata,
+      dataType: "text",
+      success: function(resultData) { 
+          var a= JSON.parse(resultData);
+     
+         
+          
+          if(a.success==true)
+              {
+               msgloading.classList.add ("collapse");
+             msgsuccess.classList.remove ("collapse");
+                   $(document.body).css({ 'cursor': 'default' });
+                 
+               
+   
+    window.open(uri+"#access_token="+a.access_token+"&token_type=bearer&state="+state,"_self");
+              
+              }
+          else{
+               $(document.body).css({ 'cursor': 'default' });
+               msgloading.classList.add ("collapse");
+         msgsuccess.classList.add ("collapse");
+        msgerror.innerHTML="<strong>Invalid Credential try again later !</strong>";
+         msgerror.classList.remove ("collapse");
+          }
+          
+     
+      }
+});
+        
+        }
+        }
+        function getParameterByName(name, url) {
+    if (!url) {
+      url = window.location.href;
+    }
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+    
+    </script> 
+</html>
